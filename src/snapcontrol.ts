@@ -35,6 +35,7 @@ namespace Snapcast {
             this.config = { instance: jconfig.instance, latency: jconfig.latency, name: jconfig.name, volume: { muted: jconfig.volume.muted, percent: jconfig.volume.percent } }
             this.lastSeen = { sec: json.lastSeen.sec, usec: json.lastSeen.usec }
             this.connected = Boolean(json.connected);
+            this.systemInfo = json.systemInfo;
         }
 
         id: string = "";
@@ -58,6 +59,8 @@ namespace Snapcast {
             usec: number;
         };
         connected: boolean = false;
+
+        systemInfo: object = {};
 
         getName(): string {
             return this.config.name.length === 0 ? this.host.name : this.config.name;
@@ -321,6 +324,9 @@ class SnapControl {
             case 'Client.OnDisconnect':
                 this.getClient(notification.params.client.id).fromJson(notification.params.client);
                 return true;
+            case 'Client.OnSystemInfoChanged':
+                this.getClient(notification.params.id).systemInfo = notification.params.systemInfo;
+                return false;
             case 'Group.OnMute':
                 this.getGroup(notification.params.id).muted = Boolean(notification.params.mute);
                 return true;

@@ -19,6 +19,7 @@ export default function Client(props: ClientProps) {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [open, setOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [sysInfoOpen, setSysInfoOpen] = useState(false);
   const [name, setName] = useState(props.client.config.name);
   const [tmpLatency, setTmpLatency] = useState(props.client.config.latency);
   const [latency, setLatency] = useState(props.client.config.latency);
@@ -68,6 +69,17 @@ export default function Client(props: ClientProps) {
     setOpen(false);
   }
 
+  function handleSysInfoClose(apply: boolean) {
+    setSysInfoOpen(false);
+  }
+
+  function handleSysInfoClicked() {
+    console.debug("handleSysInfoClicked");
+    setSysInfoOpen(true);
+    setAnchorEl(null);
+    setOpen(false);
+  }
+
   function handleNameChange(name: string) {
     console.debug('handleNameChange: ' + name);
     setName(name);
@@ -85,10 +97,20 @@ export default function Client(props: ClientProps) {
     setUpdate(update + 1);
   }
 
-  const menuitems = [];
-  menuitems.push(<MenuItem key='Menu-Details' onClick={() => { handleDetailsClicked() }}>Details</MenuItem>);
-  if (!props.client.connected)
-    menuitems.push(<MenuItem key='Menu-Delete' onClick={() => { props.onDelete(); setAnchorEl(null); setOpen(false); }}>Delete</MenuItem>);
+  function systemInfoFields(client: Snapcast.Client) : React.ReactNode {
+      if (!client.systemInfo) {
+          return;
+      }
+      return Object.entries(client.systemInfo).map(([key, val]) => {
+          return <TextField
+            margin="dense" id={"sysinfo-" + key} label={key} type="text" fullWidth variant="standard"
+            value={val}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+      });
+  }
 
   // console.debug("Render Client " + props.client.host.name + ", id: " + props.client.id);
 
@@ -122,7 +144,13 @@ export default function Client(props: ClientProps) {
               'aria-labelledby': 'basic-button',
             }}
           >
-            {menuitems}
+            <MenuItem key='Menu-Details' onClick={() => { handleDetailsClicked() }}>Details</MenuItem>
+            {props.client.systemInfo &&
+              <MenuItem key='Menu-SysInfo' onClick={() => { handleSysInfoClicked() }}>System Info</MenuItem>
+            }
+            {!props.client.connected &&
+              <MenuItem key='Menu-Delete' onClick={() => { props.onDelete(); setAnchorEl(null); setOpen(false); }}>Delete</MenuItem>
+            }
           </Menu>
         </Grid>
       </Grid>
@@ -190,6 +218,16 @@ export default function Client(props: ClientProps) {
         <DialogActions>
           <Button onClick={() => { handleDetailsClose(false) }}>Cancel</Button>
           <Button onClick={() => { handleDetailsClose(true) }}>OK</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={sysInfoOpen} onClose={() => { handleSysInfoClose(false) }}>
+        <DialogTitle>Client system information</DialogTitle>
+        <DialogContent>
+          {systemInfoFields(props.client)}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { handleSysInfoClose(false) }}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>
