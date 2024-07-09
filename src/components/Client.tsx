@@ -69,7 +69,7 @@ export default function Client(props: ClientProps) {
     setOpen(false);
   }
 
-  function handleSysInfoClose(apply: boolean) {
+  function handleSysInfoClose() {
     setSysInfoOpen(false);
   }
 
