@@ -221,13 +221,13 @@ export default function Client(props: ClientProps) {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={sysInfoOpen} onClose={() => { handleSysInfoClose(false) }}>
+      <Dialog open={sysInfoOpen} onClose={() => { handleSysInfoClose() }}>
         <DialogTitle>Client system information</DialogTitle>
         <DialogContent>
           {systemInfoFields(props.client)}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { handleSysInfoClose(false) }}>Close</Button>
+          <Button onClick={() => { handleSysInfoClose() }}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>
